@@ -1,7 +1,13 @@
 {% extends 'gestion/base.html' %}
 
 {% block content %}
-<h2>Empleados</h2>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+    <h2>Empleados</h2>
+    <button onclick="document.getElementById('modalCrear').style.display='flex'">
+        + Agregar Empleado
+    </button>
+</div>
+
 <table>
     <tr>
         <th>ID</th>
@@ -9,6 +15,7 @@
         <th>Cargo</th>
         <th>Teléfono</th>
         <th>Correo</th>
+        <th>Acciones</th>
     </tr>
     {% for empleado in empleados %}
     <tr>
@@ -17,7 +24,140 @@
         <td>{{ empleado.cargo }}</td>
         <td>{{ empleado.telefono }}</td>
         <td>{{ empleado.correo }}</td>
+        <td>
+            <button class="btn-editar"
+                data-id="{{ empleado.id }}"
+                data-nombre="{{ empleado.nombre }}"
+                data-cargo="{{ empleado.cargo }}"
+                data-telefono="{{ empleado.telefono|default:'' }}"
+                data-correo="{{ empleado.correo|default:'' }}">
+                Editar
+            </button>
+            <button class="btn-eliminar"
+                data-id="{{ empleado.id }}"
+                data-nombre="{{ empleado.nombre }}">
+                Eliminar
+            </button>
+        </td>
     </tr>
     {% endfor %}
 </table>
+
+
+<!-- ===== MODAL CREAR ===== -->
+<div id="modalCrear" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    <div style="background:white; padding:2rem; border-radius:8px; min-width:350px;">
+        <h3>Agregar Empleado</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="crear" value="1">
+            <div>
+                <label>Nombre</label>
+                <input type="text" name="nombre" required>
+            </div>
+            <div>
+                <label>Cargo</label>
+                <select name="cargo">
+                    <option value="Mesero">Mesero</option>
+                    <option value="Mesera">Mesera</option>
+                    <option value="Cajero">Cajero</option>
+                    <option value="Cajera">Cajera</option>
+                    <option value="Administrador">Administrador</option>
+                </select>
+            </div>
+            <div>
+                <label>Teléfono</label>
+                <input type="text" name="telefono">
+            </div>
+            <div>
+                <label>Correo</label>
+                <input type="email" name="correo">
+            </div>
+            <button type="submit">Guardar</button>
+            <button type="button" onclick="document.getElementById('modalCrear').style.display='none'">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+
+<!-- ===== MODAL EDITAR ===== -->
+<div id="modalEditar" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    <div style="background:white; padding:2rem; border-radius:8px; min-width:350px;">
+        <h3>Editar Empleado</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="editar" value="1">
+            <input type="hidden" name="id" id="editarId">
+            <div>
+                <label>Nombre</label>
+                <input type="text" name="nombre" id="editarNombre" required>
+            </div>
+            <div>
+                <label>Cargo</label>
+                <select name="cargo" id="editarCargo">
+                    <option value="Mesero">Mesero</option>
+                    <option value="Mesera">Mesera</option>
+                    <option value="Cajero">Cajero</option>
+                    <option value="Cajera">Cajera</option>
+                    <option value="Administrador">Administrador</option>
+                </select>
+            </div>
+            <div>
+                <label>Teléfono</label>
+                <input type="text" name="telefono" id="editarTelefono">
+            </div>
+            <div>
+                <label>Correo</label>
+                <input type="email" name="correo" id="editarCorreo">
+            </div>
+            <button type="submit">Guardar cambios</button>
+            <button type="button" onclick="document.getElementById('modalEditar').style.display='none'">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+
+<!-- ===== MODAL ELIMINAR ===== -->
+<div id="modalEliminar" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    <div style="background:white; padding:2rem; border-radius:8px; min-width:300px; text-align:center;">
+        <h3>¿Eliminar empleado?</h3>
+        <p id="eliminarNombre"></p>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="eliminar" value="1">
+            <input type="hidden" name="id" id="eliminarId">
+            <button type="submit" style="background:red; color:white;">Sí, eliminar</button>
+            <button type="button" onclick="document.getElementById('modalEliminar').style.display='none'">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    document.querySelectorAll('.btn-editar').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('editarId').value = this.dataset.id;
+            document.getElementById('editarNombre').value = this.dataset.nombre;
+            document.getElementById('editarCargo').value = this.dataset.cargo;
+            document.getElementById('editarTelefono').value = this.dataset.telefono;
+            document.getElementById('editarCorreo').value = this.dataset.correo;
+            document.getElementById('modalEditar').style.display = 'flex';
+        });
+    });
+
+    document.querySelectorAll('.btn-eliminar').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('eliminarId').value = this.dataset.id;
+            document.getElementById('eliminarNombre').textContent = this.dataset.nombre;
+            document.getElementById('modalEliminar').style.display = 'flex';
+        });
+    });
+
+    window.onclick = function(e) {
+        ['modalCrear', 'modalEditar', 'modalEliminar'].forEach(id => {
+            const modal = document.getElementById(id);
+            if (e.target === modal) modal.style.display = 'none';
+        });
+    }
+</script>
 {% endblock %}
