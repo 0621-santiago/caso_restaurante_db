@@ -1,7 +1,13 @@
 {% extends 'gestion/base.html' %}
 
 {% block content %}
-<h2>Órdenes</h2>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+    <h2>Órdenes</h2>
+    <button onclick="document.getElementById('modalCrear').style.display='flex'">
+        + Agregar Orden
+    </button>
+</div>
+
 <table>
     <tr>
         <th>ID</th>
@@ -11,6 +17,7 @@
         <th>Fecha</th>
         <th>Estado</th>
         <th>Total</th>
+        <th>Acciones</th>
     </tr>
     {% for orden in ordenes %}
     <tr>
@@ -21,7 +28,201 @@
         <td>{{ orden.fecha_hora }}</td>
         <td>{{ orden.estado_orden }}</td>
         <td>{{ orden.total }}</td>
+        <td>
+            <button class="btn-editar"
+                data-id="{{ orden.id }}"
+                data-cliente="{{ orden.cliente.id }}"
+                data-empleado="{{ orden.empleado.id }}"
+                data-mesa="{{ orden.mesa.id }}"
+                data-estado="{{ orden.estado_orden }}">
+                Editar
+            </button>
+            <button class="btn-eliminar"
+                data-id="{{ orden.id }}">
+                Eliminar
+            </button>
+            <button class="btn-detalle"
+                data-id="{{ orden.id }}"
+                data-cliente="{{ orden.cliente.nombre }}">
+                + Plato
+            </button>
+        </td>
     </tr>
     {% endfor %}
 </table>
+
+
+<!-- ===== MODAL CREAR ===== -->
+<div id="modalCrear" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    <div style="background:white; padding:2rem; border-radius:8px; min-width:350px;">
+        <h3>Agregar Orden</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="crear" value="1">
+            <div>
+                <label>Cliente</label>
+                <select name="cliente_id" required>
+                    {% for cliente in clientes %}
+                    <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Empleado</label>
+                <select name="empleado_id" required>
+                    {% for empleado in empleados %}
+                    <option value="{{ empleado.id }}">{{ empleado.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Mesa</label>
+                <select name="mesa_id" required>
+                    {% for mesa in mesas %}
+                    <option value="{{ mesa.id }}">Mesa {{ mesa.numero_mesa }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Estado</label>
+                <select name="estado_orden">
+                    <option value="Activa">Activa</option>
+                    <option value="En preparación">En preparación</option>
+                    <option value="Entregada">Entregada</option>
+                    <option value="Facturada">Facturada</option>
+                    <option value="Cancelada">Cancelada</option>
+                </select>
+            </div>
+            <button type="submit">Guardar</button>
+            <button type="button" onclick="document.getElementById('modalCrear').style.display='none'">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+
+<!-- ===== MODAL EDITAR ===== -->
+<div id="modalEditar" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    <div style="background:white; padding:2rem; border-radius:8px; min-width:350px;">
+        <h3>Editar Orden</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="editar" value="1">
+            <input type="hidden" name="id" id="editarId">
+            <div>
+                <label>Cliente</label>
+                <select name="cliente_id" id="editarCliente" required>
+                    {% for cliente in clientes %}
+                    <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Empleado</label>
+                <select name="empleado_id" id="editarEmpleado" required>
+                    {% for empleado in empleados %}
+                    <option value="{{ empleado.id }}">{{ empleado.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Mesa</label>
+                <select name="mesa_id" id="editarMesa" required>
+                    {% for mesa in mesas %}
+                    <option value="{{ mesa.id }}">Mesa {{ mesa.numero_mesa }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Estado</label>
+                <select name="estado_orden" id="editarEstado">
+                    <option value="Activa">Activa</option>
+                    <option value="En preparación">En preparación</option>
+                    <option value="Entregada">Entregada</option>
+                    <option value="Facturada">Facturada</option>
+                    <option value="Cancelada">Cancelada</option>
+                </select>
+            </div>
+            <button type="submit">Guardar cambios</button>
+            <button type="button" onclick="document.getElementById('modalEditar').style.display='none'">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+
+<!-- ===== MODAL ELIMINAR ===== -->
+<div id="modalEliminar" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    <div style="background:white; padding:2rem; border-radius:8px; min-width:300px; text-align:center;">
+        <h3>¿Eliminar orden?</h3>
+        <p id="eliminarInfo"></p>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="eliminar" value="1">
+            <input type="hidden" name="id" id="eliminarId">
+            <button type="submit" style="background:red; color:white;">Sí, eliminar</button>
+            <button type="button" onclick="document.getElementById('modalEliminar').style.display='none'">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+<!-- ===== MODAL AGREGAR DETALLE ===== -->
+<div id="modalDetalle" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    <div style="background:white; padding:2rem; border-radius:8px; min-width:350px;">
+        <h3>Agregar Plato a Orden</h3>
+        <p id="detalleOrdenInfo"></p>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="agregar_detalle" value="1">
+            <input type="hidden" name="orden_id" id="detalleOrdenId">
+            <div>
+                <label>Plato</label>
+                <select name="plato_id" required>
+                    {% for plato in platos %}
+                    <option value="{{ plato.id }}">{{ plato.nombre_plato }} — ${{ plato.precio }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Cantidad</label>
+                <input type="number" name="cantidad" min="1" value="1" required>
+            </div>
+            <button type="submit">Agregar</button>
+            <button type="button" onclick="document.getElementById('modalDetalle').style.display='none'">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.btn-editar').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('editarId').value = this.dataset.id;
+            document.getElementById('editarCliente').value = this.dataset.cliente;
+            document.getElementById('editarEmpleado').value = this.dataset.empleado;
+            document.getElementById('editarMesa').value = this.dataset.mesa;
+            document.getElementById('editarEstado').value = this.dataset.estado;
+            document.getElementById('modalEditar').style.display = 'flex';
+        });
+    });
+
+    document.querySelectorAll('.btn-eliminar').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('eliminarId').value = this.dataset.id;
+            document.getElementById('eliminarInfo').textContent = 'Orden #' + this.dataset.id;
+            document.getElementById('modalEliminar').style.display = 'flex';
+        });
+    });
+
+    window.onclick = function(e) {
+        ['modalCrear', 'modalEditar', 'modalEliminar'].forEach(id => {
+            const modal = document.getElementById(id);
+            if (e.target === modal) modal.style.display = 'none';
+        });
+    }
+    document.querySelectorAll('.btn-detalle').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('detalleOrdenId').value = this.dataset.id;
+        document.getElementById('detalleOrdenInfo').textContent = 'Orden #' + this.dataset.id + ' — ' + this.dataset.cliente;
+        document.getElementById('modalDetalle').style.display = 'flex';
+        });
+    });
+</script>
 {% endblock %}

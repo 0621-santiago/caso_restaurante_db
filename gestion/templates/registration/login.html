@@ -1,0 +1,224 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Iniciar Sesión — Pasta La Vista</title>
+  <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #e1d1b9;
+    }
+    .login-wrapper {
+      display: flex;
+      width: 820px;
+      max-width: 95vw;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+    }
+    .login-brand {
+      background-color: #8b0000;
+      color: #f2e0c0;
+      width: 320px;
+      min-width: 260px;
+      padding: 52px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .login-brand h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: #f2e0c0;
+      margin: 0 0 8px 0;
+      line-height: 1.2;
+    }
+    .login-brand .tagline {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.85rem;
+      color: rgba(242,224,192,0.7);
+      margin: 0;
+    }
+    .brand-divider {
+      width: 40px;
+      height: 2px;
+      background: rgba(242,224,192,0.35);
+      margin: 22px 0;
+    }
+    .brand-desc {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.82rem;
+      color: rgba(242,224,192,0.55);
+      line-height: 1.7;
+    }
+    .brand-footer {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.7rem;
+      color: rgba(242,224,192,0.35);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .login-form-panel {
+      flex: 1;
+      background: white;
+      padding: 52px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .login-form-panel h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: #2c2c2c;
+      margin: 0 0 6px 0;
+    }
+    .subtitulo {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.83rem;
+      color: #999;
+      margin: 0 0 30px 0;
+    }
+    .form-campo { margin-bottom: 18px; }
+    .form-campo label {
+      display: block;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.73rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+      margin-bottom: 7px;
+    }
+    .form-campo input {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px 15px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.92rem;
+      color: #333;
+      background: #fafafa;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      box-sizing: border-box;
+    }
+    .form-campo input:focus {
+      border-color: #8b0000;
+      box-shadow: 0 0 0 3px rgba(139,0,0,0.08);
+      background: white;
+    }
+    .error-box {
+      background: #fff5f5;
+      border: 1px solid #f5c6c6;
+      border-radius: 8px;
+      padding: 11px 15px;
+      margin-bottom: 20px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.82rem;
+      color: #c0392b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .error-box::before {
+      content: '!';
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid #c0392b;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .btn-ingresar {
+      width: 100%;
+      padding: 13px;
+      background-color: #8b0000;
+      color: #f2e0c0;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      margin-top: 6px;
+      transition: background-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+    .btn-ingresar:hover {
+      background-color: #6e0000;
+      box-shadow: 0 4px 16px rgba(139,0,0,0.25);
+      transform: translateY(-1px);
+    }
+    .btn-ingresar:active { transform: translateY(0); }
+    .admin-link {
+      margin-top: 18px;
+      text-align: center;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.78rem;
+      color: #aaa;
+    }
+    .admin-link a { color: #8b0000; text-decoration: none; font-weight: 700; }
+    .admin-link a:hover { text-decoration: underline; }
+    @media (max-width: 600px) {
+      .login-wrapper { flex-direction: column; }
+      .login-brand { width: 100%; min-width: unset; padding: 32px 28px; }
+      .login-form-panel { padding: 36px 28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-wrapper">
+    <div class="login-brand">
+      <div>
+        <h1>Pasta<br/>La Vista</h1>
+        <p class="tagline">El Final de tu Hambre</p>
+        <div class="brand-divider"></div>
+        <p class="brand-desc">Sistema interno de gestión para empleados y administradores del restaurante.</p>
+      </div>
+      <div class="brand-footer">Sistema de Gestión &nbsp;·&nbsp; v1.0</div>
+    </div>
+
+    <div class="login-form-panel">
+      <h2>Iniciar sesión</h2>
+      <p class="subtitulo">Ingresa tus credenciales para acceder al sistema</p>
+
+      {% if form.errors %}
+      <div class="error-box">Usuario o contraseña incorrectos. Inténtalo de nuevo.</div>
+      {% endif %}
+
+      {% if messages %}
+        {% for message in messages %}
+        <div class="error-box">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-campo">
+          <label for="id_username">Usuario</label>
+          <input type="text" id="id_username" name="username"
+                 placeholder="nombre de usuario" autocomplete="username" required />
+        </div>
+        <div class="form-campo">
+          <label for="id_password">Contraseña</label>
+          <input type="password" id="id_password" name="password"
+                 placeholder="••••••••" autocomplete="current-password" required />
+        </div>
+        <button type="submit" class="btn-ingresar">Entrar</button>
+      </form>
+
+      <p class="admin-link">
+        ¿Eres administrador? <a href="/admin/">Panel de administración →</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

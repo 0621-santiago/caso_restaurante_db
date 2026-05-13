@@ -1,72 +1,47 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
     <meta charset="UTF-8">
     <title>Restaurante Pasta La Vista</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+        .logout-form {
             margin: 0;
             padding: 0;
+            border-top: 1px solid rgba(77, 17, 17, 0.963);
         }
-        header {
-            background-color: #8B0000;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-        nav {
-            background-color: #b22222;
-            padding: 10px;
-            text-align: center;
-        }
-        nav a {
-            color: white;
-            margin: 0 12px;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .contenedor {
-            width: 90%;
-            margin: 20px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        table {
+        .logout-form button {
+            display: block;
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 10px;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
             text-align: left;
+            cursor: pointer;
+            letter-spacing: inherit;
+            transition: all 0.3s ease;
         }
-        th {
-            background-color: #eee;
-        }
-        .card {
-            display: inline-block;
-            width: 200px;
-            background: #fafafa;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 10px;
-            text-align: center;
+        .logout-form button:hover {
+            color: #f2e0c0;
+            padding-left: 30px;
         }
     </style>
 </head>
 <body>
+    <div class="contenedor-principal">
+    <aside class="sidebar">
     <header>
-        <h1>Sistema de Gestión de Pedidos - Pasta La Vista</h1>
+        <h1>Pasta La Vista</h1>
+        <p>El Final de tu Hambre</p>
     </header>
 
-    <nav>
+    <nav class="menu">
         <a href="/">Inicio</a>
         <a href="/clientes/">Clientes</a>
         <a href="/empleados/">Empleados</a>
@@ -75,11 +50,17 @@
         <a href="/ordenes/">Órdenes</a>
         <a href="/facturas/">Facturas</a>
         <a href="/admin/">Admin</a>
+        <form class="logout-form" method="post" action="/account/logout/">
+            {% csrf_token %}
+            <button type="submit">Cerrar sesión</button>
+        </form>
     </nav>
+    </aside>
 
-    <div class="contenedor">
+    <main class="contenedor">
         {% block content %}
         {% endblock %}
+    </main>
     </div>
 </body>
 </html>
