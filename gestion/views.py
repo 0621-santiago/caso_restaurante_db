@@ -1,22 +1,24 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from decimal import Decimal
 from django.contrib import messages
-# Create your views here.
-from.models import Cliente, Empleado, Mesa, Plato, Orden, Factura
+from django.contrib.auth.decorators import login_required
 from .models import Cliente, Empleado, Mesa, Plato, Orden, Factura, DetalleOrden
 
 
-def inicio (request):
+@login_required
+def inicio(request):
     context = {
-        'total_clientes':Cliente.objects.count(),
-        'total_empleados':Empleado.objects.count(),
-        'total_mesa':Mesa.objects.count(),
-        'total_plato':Plato.objects.count(),
-        'total_orden':Orden.objects.count(),
-        'total_factura':Factura.objects.count(),
+        'total_clientes': Cliente.objects.count(),
+        'total_empleados': Empleado.objects.count(),
+        'total_mesa': Mesa.objects.count(),
+        'total_plato': Plato.objects.count(),
+        'total_orden': Orden.objects.count(),
+        'total_factura': Factura.objects.count(),
     }
     return render(request, 'gestion/inicio.html', context)
 
+
+@login_required
 def lista_clientes(request):
     # CREAR
     if request.method == 'POST' and 'crear' in request.POST:
@@ -26,7 +28,7 @@ def lista_clientes(request):
             correo=request.POST['correo'],
         )
         return redirect('lista_clientes')
-    
+
     # EDITAR
     if request.method == 'POST' and 'editar' in request.POST:
         cliente = get_object_or_404(Cliente, pk=request.POST['id'])
@@ -44,9 +46,11 @@ def lista_clientes(request):
 
     clientes = Cliente.objects.all()
     return render(request, 'gestion/clientes.html', {'clientes': clientes})
-    
+
+
+@login_required
 def lista_empleados(request):
-    #CREAR
+    # CREAR
     if request.method == 'POST' and 'crear' in request.POST:
         Empleado.objects.create(
             nombre=request.POST['nombre'],
@@ -55,7 +59,8 @@ def lista_empleados(request):
             correo=request.POST['correo'],
         )
         return redirect('lista_empleados')
-    #Editar
+
+    # EDITAR
     if request.method == 'POST' and 'editar' in request.POST:
         empleado = get_object_or_404(Empleado, pk=request.POST['id'])
         empleado.nombre = request.POST['nombre']
@@ -64,7 +69,8 @@ def lista_empleados(request):
         empleado.correo = request.POST['correo']
         empleado.save()
         return redirect('lista_empleados')
-    #Eliminar
+
+    # ELIMINAR
     if request.method == 'POST' and 'eliminar' in request.POST:
         empleado = get_object_or_404(Empleado, pk=request.POST['id'])
         empleado.delete()
@@ -73,20 +79,22 @@ def lista_empleados(request):
     empleados = Empleado.objects.all()
     return render(request, 'gestion/empleados.html', {'empleados': empleados})
 
+
+@login_required
 def lista_mesas(request):
     if request.method == 'POST' and 'crear' in request.POST:
         Mesa.objects.create(
-            numero_mesa=request.POST['numero_mesa'],  # no 'numero'
+            numero_mesa=request.POST['numero_mesa'],
             capacidad=request.POST['capacidad'],
-            estado_mesa=request.POST['estado_mesa'],  # no 'estado'
+            estado_mesa=request.POST['estado_mesa'],
         )
         return redirect('lista_mesas')
 
     if request.method == 'POST' and 'editar' in request.POST:
         mesa = get_object_or_404(Mesa, pk=request.POST['id'])
-        mesa.numero_mesa = request.POST['numero_mesa']  # no 'numero'
+        mesa.numero_mesa = request.POST['numero_mesa']
         mesa.capacidad = request.POST['capacidad']
-        mesa.estado_mesa = request.POST['estado_mesa']  # no 'estado'
+        mesa.estado_mesa = request.POST['estado_mesa']
         mesa.save()
         return redirect('lista_mesas')
 
@@ -98,35 +106,39 @@ def lista_mesas(request):
     mesas = Mesa.objects.all()
     return render(request, 'gestion/mesas.html', {'mesas': mesas})
 
+
+@login_required
 def lista_platos(request):
     if request.method == 'POST' and 'crear' in request.POST:
         Plato.objects.create(
-            nombre_plato=request.POST['nombre_plato'],  # no 'nombre'
+            nombre_plato=request.POST['nombre_plato'],
             descripcion=request.POST['descripcion'],
-            precio=request.POST['precio'],  
-            categoria=request.POST['categoria'],  
-            disponible='disponible' in request.POST,  
+            precio=request.POST['precio'],
+            categoria=request.POST['categoria'],
+            disponible='disponible' in request.POST,
         )
         return redirect('lista_platos')
 
     if request.method == 'POST' and 'editar' in request.POST:
         plato = get_object_or_404(Plato, pk=request.POST['id'])
-        plato.nombre_plato = request.POST['nombre_plato']  
+        plato.nombre_plato = request.POST['nombre_plato']
         plato.descripcion = request.POST['descripcion']
-        plato.precio = request.POST['precio']  # no 'estado'
-        plato.categoria = request.POST['categoria']  
-        plato.disponible = 'disponible' in request.POST 
+        plato.precio = request.POST['precio']
+        plato.categoria = request.POST['categoria']
+        plato.disponible = 'disponible' in request.POST
         plato.save()
         return redirect('lista_platos')
-    
+
     if request.method == 'POST' and 'eliminar' in request.POST:
         plato = get_object_or_404(Plato, pk=request.POST['id'])
         plato.delete()
         return redirect('lista_platos')
-    
+
     platos = Plato.objects.all()
     return render(request, 'gestion/platos.html', {'platos': platos})
 
+
+@login_required
 def lista_ordenes(request):
     if request.method == 'POST' and 'crear' in request.POST:
         Orden.objects.create(
@@ -176,6 +188,8 @@ def lista_ordenes(request):
         'platos': platos,
     })
 
+
+@login_required
 def lista_facturas(request):
     if request.method == 'POST' and 'crear' in request.POST:
         orden = get_object_or_404(Orden, pk=request.POST['orden_id'])
