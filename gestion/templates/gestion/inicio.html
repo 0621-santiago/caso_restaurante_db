@@ -1,148 +1,51 @@
 {% extends 'gestion/base.html' %}
 
 {% block content %}
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-    <h2>Facturas</h2>
-    <button onclick="document.getElementById('modalCrear').style.display='flex'">
-        + Agregar Factura
-    </button>
+<h2>Panel de Control</h2>
+
+<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem; margin-top:1rem;">
+
+    <a href="{% url 'lista_clientes' %}" style="text-decoration:none; color:inherit;">
+        <div style="background:white; border-radius:8px; padding:1.5rem; text-align:center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            <h3>Clientes</h3>
+            <p style="font-size:2rem; font-weight:bold;">{{ total_clientes }}</p>
+        </div>
+    </a>
+
+    <a href="{% url 'lista_empleados' %}" style="text-decoration:none; color:inherit;">
+        <div style="background:white; border-radius:8px; padding:1.5rem; text-align:center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            <h3>Empleados</h3>
+            <p style="font-size:2rem; font-weight:bold;">{{ total_empleados }}</p>
+        </div>
+    </a>
+
+    <a href="{% url 'lista_mesas' %}" style="text-decoration:none; color:inherit;">
+        <div style="background:white; border-radius:8px; padding:1.5rem; text-align:center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            <h3>Mesas</h3>
+            <p style="font-size:2rem; font-weight:bold;">{{ total_mesa }}</p>
+        </div>
+    </a>
+
+    <a href="{% url 'lista_platos' %}" style="text-decoration:none; color:inherit;">
+        <div style="background:white; border-radius:8px; padding:1.5rem; text-align:center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            <h3>Platos</h3>
+            <p style="font-size:2rem; font-weight:bold;">{{ total_plato }}</p>
+        </div>
+    </a>
+
+    <a href="{% url 'lista_ordenes' %}" style="text-decoration:none; color:inherit;">
+        <div style="background:white; border-radius:8px; padding:1.5rem; text-align:center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            <h3>Órdenes</h3>
+            <p style="font-size:2rem; font-weight:bold;">{{ total_orden }}</p>
+        </div>
+    </a>
+
+    <a href="{% url 'lista_facturas' %}" style="text-decoration:none; color:inherit;">
+        <div style="background:white; border-radius:8px; padding:1.5rem; text-align:center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+            <h3>Facturas</h3>
+            <p style="font-size:2rem; font-weight:bold;">{{ total_factura }}</p>
+        </div>
+    </a>
+
 </div>
-
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Orden</th>
-        <th>Fecha</th>
-        <th>Subtotal</th>
-        <th>Impuesto</th>
-        <th>Total</th>
-        <th>Método de pago</th>
-        <th>Acciones</th>
-    </tr>
-    {% for factura in facturas %}
-    <tr>
-        <td>{{ factura.id }}</td>
-        <td>Orden #{{ factura.orden.id }}</td>
-        <td>{{ factura.fecha_factura }}</td>
-        <td>{{ factura.subtotal }}</td>
-        <td>{{ factura.impuesto }}</td>
-        <td>{{ factura.total_factura }}</td>
-        <td>{{ factura.metodo_pago }}</td>
-        <td>
-            <button class="btn-editar"
-                data-id="{{ factura.id }}"
-                data-metodo="{{ factura.metodo_pago }}">
-                Editar
-            </button>
-            <button class="btn-eliminar"
-                data-id="{{ factura.id }}">
-                Eliminar
-            </button>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-
-
-<!-- ===== MODAL CREAR ===== -->
-<div id="modalCrear" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-    <div style="background:white; padding:2rem; border-radius:8px; min-width:350px;">
-        <h3>Agregar Factura</h3>
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="crear" value="1">
-            <div>
-                <label>Orden</label>
-                <select name="orden_id" required>
-                    {% for orden in ordenes %}
-                    <option value="{{ orden.id }}">Orden #{{ orden.id }} — {{ orden.cliente.nombre }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label>Método de pago</label>
-                <select name="metodo_pago">
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Tarjeta">Tarjeta</option>
-                    <option value="Transferencia">Transferencia</option>
-                    <option value="Nequi">Nequi</option>
-                    <option value="Daviplata">Daviplata</option>
-                </select>
-            </div>
-            <small>El subtotal, impuesto y total se calculan automáticamente desde la orden.</small>
-            <br><br>
-            <button type="submit">Guardar</button>
-            <button type="button" onclick="document.getElementById('modalCrear').style.display='none'">Cancelar</button>
-        </form>
-    </div>
-</div>
-
-
-<!-- ===== MODAL EDITAR ===== -->
-<div id="modalEditar" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-    <div style="background:white; padding:2rem; border-radius:8px; min-width:350px;">
-        <h3>Editar Factura</h3>
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="editar" value="1">
-            <input type="hidden" name="id" id="editarId">
-            <div>
-                <label>Método de pago</label>
-                <select name="metodo_pago" id="editarMetodo">
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Tarjeta">Tarjeta</option>
-                    <option value="Transferencia">Transferencia</option>
-                    <option value="Nequi">Nequi</option>
-                    <option value="Daviplata">Daviplata</option>
-                </select>
-            </div>
-            <small>Solo se puede modificar el método de pago.</small>
-            <br><br>
-            <button type="submit">Guardar cambios</button>
-            <button type="button" onclick="document.getElementById('modalEditar').style.display='none'">Cancelar</button>
-        </form>
-    </div>
-</div>
-
-
-<!-- ===== MODAL ELIMINAR ===== -->
-<div id="modalEliminar" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-    <div style="background:white; padding:2rem; border-radius:8px; min-width:300px; text-align:center;">
-        <h3>¿Eliminar factura?</h3>
-        <p id="eliminarInfo"></p>
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="eliminar" value="1">
-            <input type="hidden" name="id" id="eliminarId">
-            <button type="submit" style="background:red; color:white;">Sí, eliminar</button>
-            <button type="button" onclick="document.getElementById('modalEliminar').style.display='none'">Cancelar</button>
-        </form>
-    </div>
-</div>
-
-
-<script>
-    document.querySelectorAll('.btn-editar').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.getElementById('editarId').value = this.dataset.id;
-            document.getElementById('editarMetodo').value = this.dataset.metodo;
-            document.getElementById('modalEditar').style.display = 'flex';
-        });
-    });
-
-    document.querySelectorAll('.btn-eliminar').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.getElementById('eliminarId').value = this.dataset.id;
-            document.getElementById('eliminarInfo').textContent = 'Factura #' + this.dataset.id;
-            document.getElementById('modalEliminar').style.display = 'flex';
-        });
-    });
-
-    window.onclick = function(e) {
-        ['modalCrear', 'modalEditar', 'modalEliminar'].forEach(id => {
-            const modal = document.getElementById(id);
-            if (e.target === modal) modal.style.display = 'none';
-        });
-    }
-</script>
 {% endblock %}
