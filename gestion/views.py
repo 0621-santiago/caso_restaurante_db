@@ -79,33 +79,57 @@ def lista_empleados(request):
     empleados = Empleado.objects.all()
     return render(request, 'gestion/empleados.html', {'empleados': empleados})
 
-
 @login_required
 def lista_mesas(request):
+    # ➕ CASO 1: CREAR MESA
     if request.method == 'POST' and 'crear' in request.POST:
+        num_mesa = int(request.POST.get('numero_mesa', 0))
+        capacidad = int(request.POST.get('capacidad', 0))
+        
+        # 🚫 Control de números negativos o ceros
+        if num_mesa < 1 or capacidad < 1:
+            mesas = Mesa.objects.all()
+            return render(request, 'gestion/mesas.html', {
+                'mesas': mesas, 
+                'error': 'El número de mesa y la capacidad deben ser mayores a 0.'
+            })
+            
         Mesa.objects.create(
-            numero_mesa=request.POST['numero_mesa'],
-            capacidad=request.POST['capacidad'],
-            estado_mesa=request.POST['estado_mesa'],
+            numero_mesa=num_mesa,
+            capacidad=capacidad,
+            estado_mesa=request.POST['estado_mesa']
         )
         return redirect('lista_mesas')
 
+    # ✏️ CASO 2: EDITAR MESA
     if request.method == 'POST' and 'editar' in request.POST:
+        num_mesa = int(request.POST.get('numero_mesa', 0))
+        capacidad = int(request.POST.get('capacidad', 0))
+        
+        # 🚫 Control de números negativos o ceros al editar
+        if num_mesa < 1 or capacidad < 1:
+            mesas = Mesa.objects.all()
+            return render(request, 'gestion/mesas.html', {
+                'mesas': mesas, 
+                'error': 'El número de mesa y la capacidad deben ser mayores a 0.'
+            })
+            
         mesa = get_object_or_404(Mesa, pk=request.POST['id'])
-        mesa.numero_mesa = request.POST['numero_mesa']
-        mesa.capacidad = request.POST['capacidad']
+        mesa.numero_mesa = num_mesa
+        mesa.capacidad = capacidad
         mesa.estado_mesa = request.POST['estado_mesa']
         mesa.save()
         return redirect('lista_mesas')
 
+    # 🗑️ CASO 3: ELIMINAR MESA
     if request.method == 'POST' and 'eliminar' in request.POST:
         mesa = get_object_or_404(Mesa, pk=request.POST['id'])
         mesa.delete()
         return redirect('lista_mesas')
 
+    # 📋 CARGA NORMAL DE LA PÁGINA (GET)
     mesas = Mesa.objects.all()
     return render(request, 'gestion/mesas.html', {'mesas': mesas})
-
 
 @login_required
 def lista_platos(request):

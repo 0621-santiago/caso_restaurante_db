@@ -3,45 +3,46 @@
 {% block content %}
 <h2>Panel de Control</h2>
 
-<div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem; margin-top:1rem;">
+<div class="dashboard-grid">
 
-    <a href="{% url 'lista_clientes' %}" style="text-decoration:none; color:inherit;">
-        <div style="background:white; border-radius:8px; padding:1.5rem; text-align:center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+    
+    <a href="{% url 'lista_clientes' %}">
+        <div class="card">
             <h3>Clientes</h3>
             <p style="font-size:2rem; font-weight:bold;">{{ total_clientes }}</p>
         </div>
     </a>
 
-    <a href="{% url 'lista_empleados' %}" style="text-decoration:none; color:inherit;">
-        <div style="background:white; border-radius:8px; padding:1.5rem; text-align:center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+    <a href="{% url 'lista_empleados' %}">
+        <div class="card">
             <h3>Empleados</h3>
             <p style="font-size:2rem; font-weight:bold;">{{ total_empleados }}</p>
         </div>
     </a>
 
-    <a href="{% url 'lista_mesas' %}" style="text-decoration:none; color:inherit;">
-        <div style="background:white; border-radius:8px; padding:1.5rem; text-align:center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+    <a href="{% url 'lista_mesas' %}">
+        <div class="card">
             <h3>Mesas</h3>
             <p style="font-size:2rem; font-weight:bold;">{{ total_mesa }}</p>
         </div>
     </a>
 
-    <a href="{% url 'lista_platos' %}" style="text-decoration:none; color:inherit;">
-        <div style="background:white; border-radius:8px; padding:1.5rem; text-align:center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+    <a href="{% url 'lista_platos' %}">
+        <div class="card">
             <h3>Platos</h3>
             <p style="font-size:2rem; font-weight:bold;">{{ total_plato }}</p>
         </div>
     </a>
 
-    <a href="{% url 'lista_ordenes' %}" style="text-decoration:none; color:inherit;">
-        <div style="background:white; border-radius:8px; padding:1.5rem; text-align:center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+    <a href="{% url 'lista_ordenes' %}">
+        <div class="card">
             <h3>Órdenes</h3>
             <p style="font-size:2rem; font-weight:bold;">{{ total_orden }}</p>
         </div>
     </a>
 
-    <a href="{% url 'lista_facturas' %}" style="text-decoration:none; color:inherit;">
-        <div style="background:white; border-radius:8px; padding:1.5rem; text-align:center; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+    <a href="{% url 'lista_facturas' %}">
+        <div class="card">
             <h3>Facturas</h3>
             <p style="font-size:2rem; font-weight:bold;">{{ total_factura }}</p>
         </div>

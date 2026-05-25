@@ -3,7 +3,7 @@
 {% block content %}
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
     <h2>Mesas</h2>
-    <button onclick="document.getElementById('modalCrear').style.display='flex'">
+    <button class="btn btn-add" onclick="document.getElementById('modalCrear').style.display='flex'">
         + Agregar Mesa
     </button>
 </div>
@@ -23,14 +23,14 @@
         <td>{{ mesa.capacidad }}</td>
         <td>{{ mesa.estado_mesa }}</td>
         <td>
-            <button class="btn-editar"
+            <button class="btn btn-edit"
                 data-id="{{ mesa.id }}"
                 data-numero="{{ mesa.numero_mesa }}"
                 data-capacidad="{{ mesa.capacidad }}"
                 data-estado="{{ mesa.estado_mesa }}">
                 Editar
             </button>
-            <button class="btn-eliminar"
+            <button class="btn btn-delete"
                 data-id="{{ mesa.id }}"
                 data-numero="{{ mesa.numero_mesa }}">
                 Eliminar
@@ -41,102 +41,117 @@
 </table>
 
 
-<!-- ===== MODAL CREAR ===== -->
-<div id="modalCrear" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-    <div style="background:white; padding:2rem; border-radius:8px; min-width:350px;">
+<div id="modalCrear" class="modal-overlay">
+    <div class="modal-content">
         <h3>Agregar Mesa</h3>
         <form method="POST">
             {% csrf_token %}
             <input type="hidden" name="crear" value="1">
-            <div>
+            
+            <div class="form-group">
                 <label>Número de Mesa</label>
-                <input type="number" name="numero_mesa" required>
+                <input type="number" name="numero_mesa" min="1" required>
             </div>
-            <div>
+            
+            <div class="form-group">
                 <label>Capacidad</label>
-                <input type="number" name="capacidad" required>
+                <input type="number" name="capacidad" min="1" required>
             </div>
-            <div>
+            
+            <div class="form-group">
                 <label>Estado</label>
-                <select name="estado_mesa">
+                <select name="estado_mesa" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-family: 'Lato', sans-serif; box-sizing: border-box;">
                     <option value="Disponible">Disponible</option>
                     <option value="Ocupada">Ocupada</option>
                     <option value="Reservada">Reservada</option>
                 </select>
             </div>
-            <button type="submit">Guardar</button>
-            <button type="button" onclick="document.getElementById('modalCrear').style.display='none'">Cancelar</button>
+            
+            <div class="modal-actions">
+                <button type="submit" class="btn btn-add">Guardar</button>
+                <button type="button" class="btn btn-cancel" onclick="document.getElementById('modalCrear').style.display='none'">Cancelar</button>
+            </div>
         </form>
     </div>
 </div>
 
 
-<!-- ===== MODAL EDITAR ===== -->
-<div id="modalEditar" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-    <div style="background:white; padding:2rem; border-radius:8px; min-width:350px;">
+<div id="modalEditar" class="modal-overlay">
+    <div class="modal-content">
         <h3>Editar Mesa</h3>
         <form method="POST">
             {% csrf_token %}
             <input type="hidden" name="editar" value="1">
             <input type="hidden" name="id" id="editarId">
-            <div>
+            
+            <div class="form-group">
                 <label>Número de Mesa</label>
-                <input type="number" name="numero_mesa" id="editarNumero" required>
+                <input type="number" name="numero_mesa" id="editarNumero" min="1" required>
             </div>
-            <div>
+            
+            <div class="form-group">
                 <label>Capacidad</label>
-                <input type="number" name="capacidad" id="editarCapacidad" required>
+                <input type="number" name="capacidad" id="editarCapacidad" min="1" required>
             </div>
-            <div>
+            
+            <div class="form-group">
                 <label>Estado</label>
-                <select name="estado_mesa" id="editarEstado">
+                <select name="estado_mesa" id="editarEstado" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-family: 'Lato', sans-serif; box-sizing: border-box;">
                     <option value="Disponible">Disponible</option>
                     <option value="Ocupada">Ocupada</option>
                     <option value="Reservada">Reservada</option>
                 </select>
             </div>
-            <button type="submit">Guardar cambios</button>
-            <button type="button" onclick="document.getElementById('modalEditar').style.display='none'">Cancelar</button>
+            
+            <div class="modal-actions">
+                <button type="submit" class="btn btn-save">Guardar cambios</button>
+                <button type="button" class="btn btn-cancel" onclick="document.getElementById('modalEditar').style.display='none'">Cancelar</button>
+            </div>
         </form>
     </div>
 </div>
 
 
-<!-- ===== MODAL ELIMINAR ===== -->
-<div id="modalEliminar" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-    <div style="background:white; padding:2rem; border-radius:8px; min-width:300px; text-align:center;">
+<div id="modalEliminar" class="modal-overlay">
+    <div class="modal-content" style="text-align:center;">
         <h3>¿Eliminar mesa?</h3>
-        <p id="eliminarNumero"></p>
+        <p id="eliminarNumero" style="margin-bottom: 20px; font-weight: bold; color: #444; font-size: 1.1rem;"></p>
         <form method="POST">
             {% csrf_token %}
             <input type="hidden" name="eliminar" value="1">
             <input type="hidden" name="id" id="eliminarId">
-            <button type="submit" style="background:red; color:white;">Sí, eliminar</button>
-            <button type="button" onclick="document.getElementById('modalEliminar').style.display='none'">Cancelar</button>
+            
+            <div class="modal-actions" style="justify-content: center;">
+                <button type="submit" class="btn btn-delete" style="background-color: #d9534f; color: white;">Sí, eliminar</button>
+                <button type="button" class="btn btn-cancel" onclick="document.getElementById('modalEliminar').style.display='none'">Cancelar</button>
+            </div>
         </form>
     </div>
 </div>
 
 
 <script>
-    document.querySelectorAll('.btn-editar').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.getElementById('editarId').value = this.dataset.id;
-            document.getElementById('editarNumero').value = this.dataset.numero;
-            document.getElementById('editarCapacidad').value = this.dataset.capacidad;
-            document.getElementById('editarEstado').value = this.dataset.estado;
+    document.addEventListener('click', function(e) {
+        // Intercepta SOLO los botones de Editar que están dentro de la tabla
+        const btnEdit = e.target.closest('table .btn-edit');
+        if (btnEdit) {
+            document.getElementById('editarId').value = btnEdit.getAttribute('data-id');
+            document.getElementById('editarNumero').value = btnEdit.getAttribute('data-numero');
+            document.getElementById('editarCapacidad').value = btnEdit.getAttribute('data-capacidad');
+            document.getElementById('editarEstado').value = btnEdit.getAttribute('data-estado');
             document.getElementById('modalEditar').style.display = 'flex';
-        });
-    });
+        }
 
-    document.querySelectorAll('.btn-eliminar').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.getElementById('eliminarId').value = this.dataset.id;
-            document.getElementById('eliminarNumero').textContent = 'Mesa ' + this.dataset.numero;
+        // Intercepta SOLO los botones de Eliminar que están dentro de la tabla
+        const btnDelete = e.target.closest('table .btn-delete');
+        if (btnDelete) {
+            document.getElementById('eliminarId').value = btnDelete.getAttribute('data-id');
+            document.getElementById('eliminarNumero').textContent = btnDelete.getAttribute('data-numero');
             document.getElementById('modalEliminar').style.display = 'flex';
-        });
+        }
     });
 
+    // Cierra el modal si se hace clic en la zona oscura exterior
     window.onclick = function(e) {
         ['modalCrear', 'modalEditar', 'modalEliminar'].forEach(id => {
             const modal = document.getElementById(id);
