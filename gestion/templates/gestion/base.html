@@ -2,65 +2,113 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <link rel="stylesheet" href="{% static 'css/estilos.css' %}?v=1.1">
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}?v=1.2">
     <meta charset="UTF-8">
     <title>Restaurante Pasta La Vista</title>
     <style>
-        .logout-form {
-            margin: 0;
-            padding: 0;
-            border-top: 1px solid rgba(77, 17, 17, 0.963);
-        }
+        .logout-form { margin: 0; padding: 0; border-top: 1px solid rgba(77,17,17,0.963); }
         .logout-form button {
-            display: block;
-            width: 100%;
-            padding: 15px 20px;
-            background: none;
-            border: none;
-            color: white;
-            font-family: 'Lato', sans-serif;
-            font-weight: 700;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            text-align: left;
-            cursor: pointer;
-            letter-spacing: inherit;
-            transition: all 0.3s ease;
+            display: block; width: 100%; padding: 15px 20px;
+            background: none; border: none; color: white;
+            font-family: 'Lato', sans-serif; font-weight: 700; font-size: 0.9rem;
+            text-transform: uppercase; text-align: left; cursor: pointer;
+            letter-spacing: inherit; transition: all 0.3s ease;
         }
-        .logout-form button:hover {
-            color: #f2e0c0;
-            padding-left: 30px;
+        .logout-form button:hover { color: #f2e0c0; padding-left: 30px; }
+
+        /* Badge de rol en el sidebar */
+        .rol-badge {
+            display: inline-block; padding: 3px 10px;
+            border-radius: 20px; font-size: 0.72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px; margin-top: 6px;
+        }
+        .rol-Administrador { background: #f2e0c0; color: #8b0000; }
+        .rol-Mesero        { background: #d4edda; color: #155724; }
+        .rol-Cajero        { background: #fff3cd; color: #856404; }
+        .rol-default       { background: rgba(255,255,255,0.15); color: #f2e0c0; }
+
+        .sidebar-user {
+            padding: 14px 20px 12px;
+            border-bottom: 1px solid rgba(77,17,17,0.963);
+            font-size: 0.82rem;
+        }
+        .sidebar-user .nombre { color: #f2e0c0; font-weight: 700; display: block; margin-bottom: 4px; }
+
+        /* Sección separadora en el nav */
+        .nav-section {
+            padding: 6px 20px 2px;
+            font-size: 0.65rem; text-transform: uppercase;
+            letter-spacing: 1.5px; color: rgba(242,224,192,0.4);
+            border-top: 1px solid rgba(77,17,17,0.5);
+            margin-top: 6px;
         }
     </style>
 </head>
 <body>
-    <div class="contenedor-principal">
+<div class="contenedor-principal">
     <aside class="sidebar">
-    <header>
-        <h1>Pasta La Vista</h1>
-        <p>El Final de tu Hambre</p>
-    </header>
+        <header>
+            <h1>Pasta La Vista</h1>
+            <p>El Final de tu Hambre</p>
+        </header>
 
-    <nav class="menu">
-        <a href="/">Inicio</a>
-        <a href="/clientes/">Clientes</a>
-        <a href="/empleados/">Empleados</a>
-        <a href="/mesas/">Mesas</a>
-        <a href="/platos/">Platos</a>
-        <a href="/ordenes/">Órdenes</a>
-        <a href="/facturas/">Facturas</a>
-        <a href="/admin/">Admin</a>
-        <form class="logout-form" method="post" action="/account/logout/">
-            {% csrf_token %}
-            <button type="submit">Cerrar sesión</button>
-        </form>
-    </nav>
+        <!-- Usuario y rol actual -->
+        {% if request.user.is_authenticated %}
+        <div class="sidebar-user">
+            <span class="nombre">{{ usuario_nombre }}</span>
+            <span class="rol-badge
+                {% if rol_usuario == 'Administrador' %}rol-Administrador
+                {% elif rol_usuario == 'Mesero' %}rol-Mesero
+                {% elif rol_usuario == 'Cajero' %}rol-Cajero
+                {% else %}rol-default{% endif %}">
+                {{ rol_usuario|default:"Sin rol" }}
+            </span>
+        </div>
+        {% endif %}
+
+        <nav class="menu">
+            <!-- Inicio: todos los roles -->
+            <a href="/">Inicio</a>
+
+            {% if rol_usuario == 'Administrador' %}
+            <!-- ── ADMINISTRADOR ────────────────── -->
+            <span class="nav-section">Gestión</span>
+            <a href="/clientes/">Clientes</a>
+            <a href="/empleados/">Empleados</a>
+            <a href="/mesas/">Mesas</a>
+            <a href="/platos/">Platos</a>
+            <a href="/ordenes/">Órdenes</a>
+            <a href="/facturas/">Facturas</a>
+            <span class="nav-section">Sistema</span>
+            <a href="/usuarios/">Usuarios</a>
+            <a href="/admin/">Panel Admin</a>
+
+            {% elif rol_usuario == 'Mesero' %}
+            <!-- ── MESERO ───────────────────────── -->
+            <span class="nav-section">Atención</span>
+            <a href="/mesas/">Mesas</a>
+            <a href="/ordenes/">Órdenes</a>
+            <a href="/platos/">Menú</a>
+            <a href="/clientes/">Clientes</a>
+
+            {% elif rol_usuario == 'Cajero' %}
+            <!-- ── CAJERO ───────────────────────── -->
+            <span class="nav-section">Caja</span>
+            <a href="/ordenes/">Órdenes Pendientes</a>
+            <a href="/facturas/">Facturas</a>
+            <a href="/mesas/">Estado Mesas</a>
+            {% endif %}
+
+            <form class="logout-form" method="post" action="/account/logout/">
+                {% csrf_token %}
+                <button type="submit">Cerrar sesión</button>
+            </form>
+        </nav>
     </aside>
 
     <main class="contenedor">
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </main>
-    </div>
+</div>
 </body>
 </html>

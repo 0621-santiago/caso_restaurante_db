@@ -3,50 +3,108 @@
 {% block content %}
 <h2>Panel de Control</h2>
 
+{% if rol_usuario == 'Administrador' %}
+<!-- ═══════════════════════════════════════════════════
+     PANEL ADMINISTRADOR
+════════════════════════════════════════════════════ -->
+<p style="color:#888; margin-bottom:20px;">Acceso completo al sistema.</p>
 <div class="dashboard-grid">
-
-    
     <a href="{% url 'lista_clientes' %}">
-        <div class="card">
-            <h3>Clientes</h3>
-            <p style="font-size:2rem; font-weight:bold;">{{ total_clientes }}</p>
-        </div>
+        <div class="card"><h3>Clientes</h3>
+        <p style="font-size:2rem;font-weight:bold;">{{ total_clientes }}</p></div>
     </a>
-
     <a href="{% url 'lista_empleados' %}">
-        <div class="card">
-            <h3>Empleados</h3>
-            <p style="font-size:2rem; font-weight:bold;">{{ total_empleados }}</p>
-        </div>
+        <div class="card"><h3>Empleados</h3>
+        <p style="font-size:2rem;font-weight:bold;">{{ total_empleados }}</p></div>
     </a>
+    <a href="{% url 'lista_mesas' %}">
+        <div class="card"><h3>Mesas</h3>
+        <p style="font-size:2rem;font-weight:bold;">{{ total_mesa }}</p></div>
+    </a>
+    <a href="{% url 'lista_platos' %}">
+        <div class="card"><h3>Platos</h3>
+        <p style="font-size:2rem;font-weight:bold;">{{ total_plato }}</p></div>
+    </a>
+    <a href="{% url 'lista_ordenes' %}">
+        <div class="card"><h3>Órdenes</h3>
+        <p style="font-size:2rem;font-weight:bold;">{{ total_orden }}</p></div>
+    </a>
+    <a href="{% url 'lista_facturas' %}">
+        <div class="card"><h3>Facturas</h3>
+        <p style="font-size:2rem;font-weight:bold;">{{ total_factura }}</p></div>
+    </a>
+    <a href="{% url 'lista_usuarios' %}">
+        <div class="card"><h3>Usuarios</h3>
+        <p style="font-size:2rem;font-weight:bold;">{{ total_usuarios }}</p></div>
+    </a>
+</div>
 
+{% elif rol_usuario == 'Mesero' %}
+<!-- ═══════════════════════════════════════════════════
+     PANEL MESERO
+════════════════════════════════════════════════════ -->
+<p style="color:#888; margin-bottom:20px;">Gestión de mesas y pedidos.</p>
+<div class="dashboard-grid">
     <a href="{% url 'lista_mesas' %}">
         <div class="card">
-            <h3>Mesas</h3>
-            <p style="font-size:2rem; font-weight:bold;">{{ total_mesa }}</p>
+            <h3>Mesas Disponibles</h3>
+            <p style="font-size:2rem;font-weight:bold;color:#28a745;">{{ mesas_disponibles }}</p>
         </div>
     </a>
-
-    <a href="{% url 'lista_platos' %}">
+    <a href="{% url 'lista_mesas' %}">
         <div class="card">
-            <h3>Platos</h3>
-            <p style="font-size:2rem; font-weight:bold;">{{ total_plato }}</p>
+            <h3>Mesas Ocupadas</h3>
+            <p style="font-size:2rem;font-weight:bold;color:#dc3545;">{{ mesas_ocupadas }}</p>
         </div>
     </a>
-
+    <a href="{% url 'lista_mesas' %}">
+        <div class="card">
+            <h3>Mesas Reservadas</h3>
+            <p style="font-size:2rem;font-weight:bold;color:#ffc107;">{{ mesas_reservadas }}</p>
+        </div>
+    </a>
     <a href="{% url 'lista_ordenes' %}">
         <div class="card">
-            <h3>Órdenes</h3>
-            <p style="font-size:2rem; font-weight:bold;">{{ total_orden }}</p>
+            <h3>Órdenes Activas</h3>
+            <p style="font-size:2rem;font-weight:bold;color:#8b0000;">{{ ordenes_activas }}</p>
         </div>
     </a>
+    <a href="{% url 'lista_platos' %}">
+        <div class="card">
+            <h3>Platos Disponibles</h3>
+            <p style="font-size:2rem;font-weight:bold;">{{ total_platos }}</p>
+        </div>
+    </a>
+</div>
 
+{% elif rol_usuario == 'Cajero' %}
+<!-- ═══════════════════════════════════════════════════
+     PANEL CAJERO
+════════════════════════════════════════════════════ -->
+<p style="color:#888; margin-bottom:20px;">Facturación y cobros.</p>
+<div class="dashboard-grid">
+    <a href="{% url 'lista_ordenes' %}">
+        <div class="card">
+            <h3>Órdenes por Cobrar</h3>
+            <p style="font-size:2rem;font-weight:bold;color:#856404;">{{ ordenes_pendientes }}</p>
+        </div>
+    </a>
     <a href="{% url 'lista_facturas' %}">
         <div class="card">
-            <h3>Facturas</h3>
-            <p style="font-size:2rem; font-weight:bold;">{{ total_factura }}</p>
+            <h3>Facturas Generadas</h3>
+            <p style="font-size:2rem;font-weight:bold;color:#8b0000;">{{ total_facturas }}</p>
         </div>
     </a>
-
+    <a href="{% url 'lista_mesas' %}">
+        <div class="card">
+            <h3>Estado de Mesas</h3>
+            <p style="font-size:2rem;font-weight:bold;">→</p>
+        </div>
+    </a>
 </div>
+
+{% else %}
+<p style="color:#888;">Tu cuenta no tiene un rol asignado. Contacta al administrador.</p>
+{% endif %}
+
 {% endblock %}

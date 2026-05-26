@@ -3,9 +3,11 @@
 {% block content %}
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
     <h2>Órdenes</h2>
+    {% if es_admin or es_mesero %}
     <button class="btn btn-add" onclick="document.getElementById('modalCrear').style.display='flex'">
         + Agregar Orden
     </button>
+    {% endif %}
 </div>
 
 <table>
@@ -17,7 +19,7 @@
         <th>Fecha</th>
         <th>Estado</th>
         <th>Total</th>
-        <th>Acciones</th>
+        {% if es_admin or es_mesero %}<th>Acciones</th>{% endif %}
     </tr>
     {% for orden in ordenes %}
     <tr>

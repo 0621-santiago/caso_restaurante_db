@@ -3,9 +3,11 @@
 {% block content %}
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
     <h2>Empleados</h2>
+    {% if es_admin %}
     <button class="btn btn-add" onclick="document.getElementById('modalCrear').style.display='flex'">
         + Agregar Empleado
     </button>
+    {% endif %}
 </div>
 
 <table>
@@ -15,7 +17,7 @@
         <th>Cargo</th>
         <th>Teléfono</th>
         <th>Correo</th>
-        <th>Acciones</th>
+        {% if es_admin %}<th>Acciones</th>{% endif %}
     </tr>
     {% for empleado in empleados %}
     <tr>

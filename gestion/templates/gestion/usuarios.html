@@ -1,0 +1,168 @@
+{% extends 'gestion/base.html' %}
+
+{% block content %}
+<h2>Gestión de Usuarios</h2>
+
+{% if error %}
+<div style="background:#fff5f5;border:1px solid #f5c6c6;border-radius:8px;
+     padding:11px 15px;margin-bottom:18px;color:#c0392b;font-size:0.88rem;">
+    ⚠ {{ error }}
+</div>
+{% endif %}
+
+<!-- ── FORMULARIO CREAR USUARIO ───────────────────────── -->
+<div style="background:white;border-radius:12px;padding:24px;
+     box-shadow:0 2px 8px rgba(0,0,0,0.07);margin-bottom:28px;">
+    <h3 style="margin-top:0;font-family:'Playfair Display',serif;color:#8b0000;">
+        Crear nuevo usuario
+    </h3>
+    <form method="post">
+        {% csrf_token %}
+        <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;">
+            <div>
+                <label style="display:block;font-size:0.72rem;font-weight:700;
+                    text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:5px;">
+                    Usuario *
+                </label>
+                <input type="text" name="username" required placeholder="nombre_usuario"
+                    style="padding:10px 13px;border:1px solid #ddd;border-radius:8px;
+                    font-size:0.9rem;width:170px;">
+            </div>
+            <div>
+                <label style="display:block;font-size:0.72rem;font-weight:700;
+                    text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:5px;">
+                    Contraseña *
+                </label>
+                <input type="password" name="password" required placeholder="••••••••"
+                    style="padding:10px 13px;border:1px solid #ddd;border-radius:8px;
+                    font-size:0.9rem;width:170px;">
+            </div>
+            <div>
+                <label style="display:block;font-size:0.72rem;font-weight:700;
+                    text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:5px;">
+                    Nombre
+                </label>
+                <input type="text" name="first_name" placeholder="Nombre"
+                    style="padding:10px 13px;border:1px solid #ddd;border-radius:8px;
+                    font-size:0.9rem;width:140px;">
+            </div>
+            <div>
+                <label style="display:block;font-size:0.72rem;font-weight:700;
+                    text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:5px;">
+                    Apellido
+                </label>
+                <input type="text" name="last_name" placeholder="Apellido"
+                    style="padding:10px 13px;border:1px solid #ddd;border-radius:8px;
+                    font-size:0.9rem;width:140px;">
+            </div>
+            <div>
+                <label style="display:block;font-size:0.72rem;font-weight:700;
+                    text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:5px;">
+                    Rol
+                </label>
+                <select name="rol_id"
+                    style="padding:10px 13px;border:1px solid #ddd;border-radius:8px;
+                    font-size:0.9rem;width:160px;background:white;">
+                    <option value="">-- Sin rol --</option>
+                    {% for rol in roles %}
+                    <option value="{{ rol.id }}">{{ rol.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <button type="submit" name="crear"
+                    style="padding:10px 22px;background:#8b0000;color:#f2e0c0;
+                    border:none;border-radius:8px;font-family:'Lato',sans-serif;
+                    font-weight:700;cursor:pointer;font-size:0.9rem;">
+                    + Crear Usuario
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- ── TABLA DE USUARIOS ──────────────────────────────── -->
+<table>
+    <thead>
+        <tr>
+            <th>Usuario</th>
+            <th>Nombre completo</th>
+            <th>Rol actual</th>
+            <th>Superusuario</th>
+            <th>Cambiar rol</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for u in usuarios %}
+        <tr>
+            <td><strong>{{ u.username }}</strong></td>
+            <td>{{ u.get_full_name|default:"—" }}</td>
+            <td>
+                {% with u.groups.first as g %}
+                {% if g %}
+                    <span style="padding:3px 10px;border-radius:12px;font-size:0.78rem;
+                        font-weight:700;
+                        {% if g.name == 'Administrador' %}background:#f2e0c0;color:#8b0000;
+                        {% elif g.name == 'Mesero' %}background:#d4edda;color:#155724;
+                        {% elif g.name == 'Cajero' %}background:#fff3cd;color:#856404;
+                        {% endif %}">
+                        {{ g.name }}
+                    </span>
+                {% else %}
+                    <span style="color:#aaa;font-size:0.85rem;">Sin rol</span>
+                {% endif %}
+                {% endwith %}
+            </td>
+            <td style="text-align:center;">
+                {% if u.is_superuser %}✓{% else %}—{% endif %}
+            </td>
+            <td>
+                {% if not u.is_superuser %}
+                <form method="post" style="display:flex;gap:8px;align-items:center;">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{ u.id }}">
+                    <select name="rol_id"
+                        style="padding:6px 10px;border:1px solid #ddd;border-radius:6px;
+                        font-size:0.85rem;background:white;">
+                        <option value="">-- Sin rol --</option>
+                        {% for rol in roles %}
+                        <option value="{{ rol.id }}"
+                            {% if u.groups.first.id == rol.id %}selected{% endif %}>
+                            {{ rol.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" name="asignar_rol"
+                        style="padding:6px 14px;background:#2c5f2e;color:white;
+                        border:none;border-radius:6px;cursor:pointer;font-size:0.82rem;">
+                        Guardar
+                    </button>
+                </form>
+                {% else %}
+                <span style="color:#aaa;font-size:0.82rem;">No editable</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if not u.is_superuser and u.id != request.user.id %}
+                <form method="post" style="display:inline;"
+                    onsubmit="return confirm('¿Eliminar usuario {{ u.username }}?')">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{ u.id }}">
+                    <button type="submit" name="eliminar"
+                        style="padding:6px 14px;background:#8b0000;color:white;
+                        border:none;border-radius:6px;cursor:pointer;font-size:0.82rem;">
+                        Eliminar
+                    </button>
+                </form>
+                {% else %}
+                <span style="color:#aaa;font-size:0.82rem;">—</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" style="text-align:center;color:#aaa;">No hay usuarios registrados.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

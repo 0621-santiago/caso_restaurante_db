@@ -3,70 +3,51 @@
 {% block content %}
 <div style="display:flex; justify-content:space-between; align-items:center;">
     <h2>Clientes</h2>
+    {% if es_admin %}
     <button class="btn btn-add" onclick="document.getElementById('modalCrear').style.display='flex'">
         + Agregar Cliente
     </button>
+    {% else %}
+    <span style="color:#888;font-size:0.85rem;">Vista de solo lectura — Rol: {{ rol_usuario }}</span>
+    {% endif %}
 </div>
 
 <table>
     <tr>
-        <th>ID</th>
-        <th>Nombre</th>
-        <th>Teléfono</th>
-        <th>Correo</th>
-        <th>Acciones</th>
+        <th>ID</th><th>Nombre</th><th>Teléfono</th><th>Correo</th>
+        {% if es_admin %}<th>Acciones</th>{% endif %}
     </tr>
     {% for cliente in clientes %}
     <tr>
         <td>{{ cliente.id }}</td>
         <td>{{ cliente.nombre }}</td>
-        <td>{{ cliente.telefono }}</td>
-        <td>{{ cliente.correo }}</td>
-       <td>
-    <!-- Botón Editar -->
-    <button class="btn btn-edit"
-        data-id="{{ cliente.id }}"
-        data-nombre="{{ cliente.nombre }}"
-        data-telefono="{{ cliente.telefono|default:'' }}"
-        data-correo="{{ cliente.correo|default:'' }}">
-        Editar
-    </button>
-
-    <!-- Botón Eliminar -->
-    <button class="btn btn-delete"
-        data-id="{{ cliente.id }}"
-        data-nombre="{{ cliente.nombre }}">
-        Eliminar
-    </button>
-</td>
+        <td>{{ cliente.telefono|default:"—" }}</td>
+        <td>{{ cliente.correo|default:"—" }}</td>
+        {% if es_admin %}
+        <td>
+            <button class="btn btn-edit"
+                data-id="{{ cliente.id }}" data-nombre="{{ cliente.nombre }}"
+                data-telefono="{{ cliente.telefono|default:'' }}"
+                data-correo="{{ cliente.correo|default:'' }}">Editar</button>
+            <button class="btn btn-delete"
+                data-id="{{ cliente.id }}" data-nombre="{{ cliente.nombre }}">Eliminar</button>
+        </td>
+        {% endif %}
     </tr>
+    {% empty %}
+    <tr><td colspan="5" style="text-align:center;color:#aaa;">No hay clientes registrados.</td></tr>
     {% endfor %}
 </table>
 
-
-<!-- ===== MODAL CREAR ===== -->
+{% if es_admin %}
+<!-- MODAL CREAR -->
 <div id="modalCrear" class="modal-overlay">
     <div class="modal-content">
         <h3>Agregar Cliente</h3>
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="crear" value="1">
-            
-            <div class="form-group">
-                <label>Nombre</label>
-                <input type="text" name="nombre" required placeholder="Ej. Juan Pérez">
-            </div>
-            
-            <div class="form-group">
-                <label>Teléfono</label>
-                <input type="tel" name="telefono" placeholder="Ej. 311 000 0000">
-            </div>
-            
-            <div class="form-group">
-                <label>Correo</label>
-                <input type="email" name="correo" placeholder="ejemplo@correo.com">
-            </div>
-
+        <form method="POST">{% csrf_token %}<input type="hidden" name="crear" value="1">
+            <div class="form-group"><label>Nombre</label><input type="text" name="nombre" required placeholder="Ej. Juan Pérez"></div>
+            <div class="form-group"><label>Teléfono</label><input type="tel" name="telefono" placeholder="311 000 0000"></div>
+            <div class="form-group"><label>Correo</label><input type="email" name="correo" placeholder="ejemplo@correo.com"></div>
             <div class="modal-actions">
                 <button type="submit" class="btn btn-add">Guardar</button>
                 <button type="button" class="btn btn-cancel" onclick="document.getElementById('modalCrear').style.display='none'">Cancelar</button>
@@ -75,28 +56,14 @@
     </div>
 </div>
 
-<!-- ===== MODAL EDITAR ===== -->
+<!-- MODAL EDITAR -->
 <div id="modalEditar" class="modal-overlay">
     <div class="modal-content">
         <h3>Editar Cliente</h3>
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="editar" value="1">
-            <input type="hidden" name="id" id="editarId">
-            
-            <div class="form-group">
-                <label>Nombre</label>
-                <input type="text" name="nombre" id="editarNombre" required>
-            </div>
-            <div class="form-group">
-                <label>Teléfono</label>
-                <input type="tel" name="telefono" id="editarTelefono">
-            </div>
-            <div class="form-group">
-                <label>Correo</label>
-                <input type="email" name="correo" id="editarCorreo">
-            </div>
-
+        <form method="POST">{% csrf_token %}<input type="hidden" name="editar" value="1"><input type="hidden" name="id" id="editarId">
+            <div class="form-group"><label>Nombre</label><input type="text" name="nombre" id="editarNombre" required></div>
+            <div class="form-group"><label>Teléfono</label><input type="tel" name="telefono" id="editarTelefono"></div>
+            <div class="form-group"><label>Correo</label><input type="email" name="correo" id="editarCorreo"></div>
             <div class="modal-actions">
                 <button type="submit" class="btn btn-add">Guardar cambios</button>
                 <button type="button" class="btn btn-cancel" onclick="document.getElementById('modalEditar').style.display='none'">Cancelar</button>
@@ -105,17 +72,13 @@
     </div>
 </div>
 
-<!-- ===== MODAL ELIMINAR  ===== -->
+<!-- MODAL ELIMINAR -->
 <div id="modalEliminar" class="modal-overlay">
     <div class="modal-content" style="text-align:center;">
         <h3>¿Eliminar cliente?</h3>
-        <p id="eliminarNombre" style="margin-bottom: 20px; font-weight: bold;"></p>
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="eliminar" value="1">
-            <input type="hidden" name="id" id="eliminarId">
-            
-            <div class="modal-actions" style="justify-content: center;">
+        <p id="eliminarNombre" style="margin-bottom:20px;font-weight:bold;"></p>
+        <form method="POST">{% csrf_token %}<input type="hidden" name="eliminar" value="1"><input type="hidden" name="id" id="eliminarId">
+            <div class="modal-actions" style="justify-content:center;">
                 <button type="submit" class="btn btn-confirm-delete">Sí, eliminar</button>
                 <button type="button" class="btn btn-cancel" onclick="document.getElementById('modalEliminar').style.display='none'">Cancelar</button>
             </div>
@@ -124,36 +87,28 @@
 </div>
 
 <script>
-    // Editar
-    document.querySelectorAll('.btn-edit').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.getElementById('editarId').value = this.dataset.id;
-            document.getElementById('editarNombre').value = this.dataset.nombre;
-            document.getElementById('editarTelefono').value = this.dataset.telefono;
-            document.getElementById('editarCorreo').value = this.dataset.correo;
-            document.getElementById('modalEditar').style.display = 'flex';
-        });
+document.querySelectorAll('.btn-edit').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('editarId').value = this.dataset.id;
+        document.getElementById('editarNombre').value = this.dataset.nombre;
+        document.getElementById('editarTelefono').value = this.dataset.telefono;
+        document.getElementById('editarCorreo').value = this.dataset.correo;
+        document.getElementById('modalEditar').style.display = 'flex';
     });
-
-    // Eliminar
-    document.addEventListener('click', function(e) {
-        const btn = e.target.closest('.btn-delete');
-        if (btn) {
-            const idCliente = btn.getAttribute('data-id');
-            const nombreCliente = btn.getAttribute('data-nombre');
-
-            document.getElementById('eliminarId').value = idCliente;
-            document.getElementById('eliminarNombre').textContent = nombreCliente;
-            document.getElementById('modalEliminar').style.display = 'flex';
-        }
-    });
-
-    // Cerrar modal haciendo clic fuera
-    window.onclick = function(e) {
-        ['modalCrear', 'modalEditar', 'modalEliminar'].forEach(id => {
-            const modal = document.getElementById(id);
-            if (e.target === modal) modal.style.display = 'none';
-        });
+});
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.btn-delete');
+    if (btn) {
+        document.getElementById('eliminarId').value = btn.dataset.id;
+        document.getElementById('eliminarNombre').textContent = btn.dataset.nombre;
+        document.getElementById('modalEliminar').style.display = 'flex';
     }
+});
+window.onclick = function(e) {
+    ['modalCrear','modalEditar','modalEliminar'].forEach(id => {
+        const m = document.getElementById(id); if (e.target===m) m.style.display='none';
+    });
+}
 </script>
+{% endif %}
 {% endblock %}
