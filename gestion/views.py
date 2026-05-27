@@ -116,7 +116,7 @@ def lista_empleados(request):
         return redirect('lista_empleados')
 
     empleados = Empleado.objects.all()
-    return render(request, 'gestion/empleados.html', {'empleados': empleados})
+    return render(request, 'gestion/empleados.html', {'empleados': empleados, 'es_admin': True})
 
 
 # ─────────────────────────────────────────────────────────────────────────────
